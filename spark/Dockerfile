@@ -92,7 +92,7 @@ RUN echo '#!/bin/sh' > /bin/marimo-notebook \
 && echo 'cd /home/iceberg/notebooks' >> /bin/marimo-notebook \
 && echo 'export SPARK_HOME=/opt/spark' >> /bin/marimo-notebook \
 && echo 'export PYTHONPATH=$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.9.7-src.zip:$PYTHONPATH' >> /bin/marimo-notebook \
-&& echo 'marimo edit --host 0.0.0.0 --port 8888 --no-open .' >> /bin/marimo-notebook \
+&& echo 'marimo edit --host 0.0.0.0 --port 8888 --headless .' >> /bin/marimo-notebook \
 && chmod u+x /bin/marimo-notebook
 
 # Add a marimo-run command for running a specific notebook as an app
