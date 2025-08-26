@@ -1,9 +1,10 @@
 pyiceberg[pyarrow,duckdb,pandas]==0.9.1
 matplotlib==3.10.5
-scipy==1.16.1
+scipy==1.13.1
 duckdb-engine==0.17.0
 grpcio==1.74.0
 pycolor==1.2.1
-marimo==0.9.19
+marimo==0.15.0
 altair==5.5.0
 polars==1.32.3
+pyarrow==19.0.1

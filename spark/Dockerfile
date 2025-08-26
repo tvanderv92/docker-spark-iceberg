@@ -33,9 +33,6 @@ RUN apt-get update && \
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 
-# Add scala kernel via spylon-kernel
-RUN python3 -m spylon_kernel install
-
 # Optional env variables
 ENV SPARK_HOME=${SPARK_HOME:-"/opt/spark"}
 ENV PYTHONPATH=$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.9.7-src.zip:$PYTHONPATH
@@ -90,20 +87,27 @@ RUN mkdir -p /home/iceberg/data \
 RUN mkdir -p /home/iceberg/localwarehouse /home/iceberg/notebooks /home/iceberg/warehouse /home/iceberg/spark-events /home/iceberg
 COPY notebooks/ /home/iceberg/notebooks
 
-# Add a notebook command
-RUN echo '#! /bin/sh' >> /bin/notebook \
- && echo 'export PYSPARK_DRIVER_PYTHON=jupyter-notebook' >> /bin/notebook \
- && echo "export PYSPARK_DRIVER_PYTHON_OPTS=\"--notebook-dir=/home/iceberg/notebooks --ip='*' --NotebookApp.token='' --NotebookApp.password='' --port=8888 --no-browser --allow-root\"" >> /bin/notebook \
- && echo "pyspark" >> /bin/notebook \
- && chmod u+x /bin/notebook
+# Add a marimo-notebook command for running marimo with Spark
+RUN echo '#!/bin/sh' > /bin/marimo-notebook \
+&& echo 'cd /home/iceberg/notebooks' >> /bin/marimo-notebook \
+&& echo 'export SPARK_HOME=/opt/spark' >> /bin/marimo-notebook \
+&& echo 'export PYTHONPATH=$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.9.7-src.zip:$PYTHONPATH' >> /bin/marimo-notebook \
+&& echo 'marimo edit --host 0.0.0.0 --port 8888 --no-open .' >> /bin/marimo-notebook \
+&& chmod u+x /bin/marimo-notebook
 
-# Add a pyspark-notebook command (alias for notebook command for backwards-compatibility)
-RUN echo '#! /bin/sh' >> /bin/pyspark-notebook \
- && echo 'export PYSPARK_DRIVER_PYTHON=jupyter-notebook' >> /bin/pyspark-notebook \
- && echo "export PYSPARK_DRIVER_PYTHON_OPTS=\"--notebook-dir=/home/iceberg/notebooks --ip='*' --NotebookApp.token='' --NotebookApp.password='' --port=8888 --no-browser --allow-root\"" >> /bin/pyspark-notebook \
- && echo "pyspark" >> /bin/pyspark-notebook \
- && chmod u+x /bin/pyspark-notebook
+# Add a marimo-run command for running a specific notebook as an app
+RUN echo '#!/bin/sh' > /bin/marimo-run \
+&& echo 'cd /home/iceberg/notebooks' >> /bin/marimo-run \
+&& echo 'export SPARK_HOME=/opt/spark' >> /bin/marimo-run \
+&& echo 'export PYTHONPATH=$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.9.7-src.zip:$PYTHONPATH' >> /bin/marimo-run \
+&& echo 'if [ -z "$1" ]; then' >> /bin/marimo-run \
+&& echo '  echo "Usage: marimo-run <notebook.py>"' >> /bin/marimo-run \
+&& echo '  exit 1' >> /bin/marimo-run \
+&& echo 'fi' >> /bin/marimo-run \
+&& echo 'marimo run "$1" --host 0.0.0.0 --port 8888' >> /bin/marimo-run \
+&& chmod u+x /bin/marimo-run
 
+# Keep IPython profile for enhanced shell experience (marimo can use IPython features)
 RUN mkdir -p /root/.ipython/profile_default/startup
 COPY ipython/startup/00-prettytables.py /root/.ipython/profile_default/startup
 COPY ipython/startup/README /root/.ipython/profile_default/startup
@@ -119,4 +123,4 @@ COPY .pyiceberg.yaml /root/.pyiceberg.yaml
 COPY entrypoint.sh .
 
 ENTRYPOINT ["./entrypoint.sh"]
-CMD ["notebook"]
+CMD ["marimo-notebook"]
