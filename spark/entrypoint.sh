@@ -23,6 +23,14 @@ start-worker.sh spark://spark-iceberg:7077
 start-history-server.sh
 start-thriftserver.sh  --driver-java-options "-Dderby.system.home=/tmp/derby"
 
+echo "Starting Spark Connect Server..."
+$SPARK_HOME/sbin/start-connect-server.sh \
+  --packages org.apache.spark:spark-connect_2.12:3.5.6 \
+  --conf spark.connect.grpc.binding.port=15002 \
+  --conf spark.master=spark://spark-iceberg:7077 &
+
+sleep 5
+
 # Entrypoint, for example notebook, pyspark or spark-sql
 if [[ $# -gt 0 ]] ; then
     eval "$1"
