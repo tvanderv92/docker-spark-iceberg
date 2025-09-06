@@ -33,6 +33,12 @@ services:
       - AWS_SECRET_ACCESS_KEY=password
       - AWS_REGION=us-east-1
       - SPARK_CONNECT_ENABLED=true
+      - MARIMO_ROOT=/home/iceberg/notebooks
+      - MARIMO_LOG=/opt/spark/logs/marimo.out
+      - HOME=/home/iceberg
+      - XDG_CONFIG_HOME=/home/iceberg/.config
+      - XDG_CACHE_HOME=/home/iceberg/.cache
+      - XDG_DATA_HOME=/home/iceberg/.local/share
     ports:
       - 8888:8888
       - 8080:8080

@@ -31,7 +31,30 @@ $SPARK_HOME/sbin/start-connect-server.sh \
 
 sleep 5
 
+# Set up directories for Marimo
+export HOME=${HOME:-/home/iceberg}
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+export XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
+export XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
+export MARIMO_ROOT=${MARIMO_ROOT:-/home/iceberg/notebooks}
+export MARIMO_LOG=${MARIMO_LOG:-/opt/spark/logs/marimo.out}
+
+# Create necessary directories
+mkdir -p "$HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$MARIMO_ROOT"
+mkdir -p "$(dirname "$MARIMO_LOG")"
+
+# Change to MARIMO_ROOT directory
+cd "$MARIMO_ROOT"
+
+echo "Starting Marimo on 0.0.0.0:8888 with root=$MARIMO_ROOT (log: $MARIMO_LOG)"
+
 # Entrypoint, for example notebook, pyspark or spark-sql
 if [[ $# -gt 0 ]] ; then
-    eval "$1"
+    if [[ "$1" == "marimo-notebook" ]]; then
+        # Custom marimo startup with proper logging and directory setup
+        marimo edit "$MARIMO_ROOT" --host 0.0.0.0 --port 8888 --headless > "$MARIMO_LOG" 2>&1 &
+        wait
+    else
+        eval "$1"
+    fi
 fi
