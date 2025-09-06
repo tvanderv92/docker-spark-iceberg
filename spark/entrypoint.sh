@@ -17,8 +17,17 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# Get current container hostname for dynamic configuration
+CONTAINER_HOSTNAME=$(hostname)
+SPARK_MASTER_URL="spark://${CONTAINER_HOSTNAME}:7077"
+
+# Update spark-defaults.conf with dynamic master URL
+sed -i "s|spark.master.*|spark.master                           ${SPARK_MASTER_URL}|g" /opt/spark/conf/spark-defaults.conf
+
+echo "Using Spark Master URL: ${SPARK_MASTER_URL}"
+
 start-master.sh -p 7077
-start-worker.sh spark://spark-iceberg:7077
+start-worker.sh ${SPARK_MASTER_URL}
 
 start-history-server.sh
 start-thriftserver.sh  --driver-java-options "-Dderby.system.home=/tmp/derby"
@@ -26,8 +35,7 @@ start-thriftserver.sh  --driver-java-options "-Dderby.system.home=/tmp/derby"
 echo "Starting Spark Connect Server..."
 $SPARK_HOME/sbin/start-connect-server.sh \
   --packages org.apache.spark:spark-connect_2.12:3.5.6 \
-  --conf spark.connect.grpc.binding.port=15002 \
-  --conf spark.master=spark://spark-iceberg:7077 &
+  --conf spark.connect.grpc.binding.port=15002 &
 
 sleep 5
 
