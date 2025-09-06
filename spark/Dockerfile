@@ -42,6 +42,7 @@ WORKDIR ${SPARK_HOME}
 ENV SPARK_VERSION=3.5.6
 ENV SPARK_MAJOR_VERSION=3.5
 ENV ICEBERG_VERSION=1.9.0
+ENV SPARK_XML_VERSION=0.18.0
 
 # Download spark
 RUN mkdir -p ${SPARK_HOME} \
@@ -61,8 +62,8 @@ RUN curl -s https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-gcp-bundle
 # Download Azure bundle
 RUN curl -s https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-azure-bundle/${ICEBERG_VERSION}/iceberg-azure-bundle-${ICEBERG_VERSION}.jar -Lo /opt/spark/jars/iceberg-azure-bundle-${ICEBERG_VERSION}.jar
 
-RUN curl -s https://repo1.maven.org/maven2/com/databricks/spark-xml_2.12/0.18.0/spark-xml_2.12-0.18.0.jar -Lo /opt/spark/jars/spark-xml_2.12-0.17.0.jar
-
+# Download spark-xml library
+RUN curl -s https://repo1.maven.org/maven2/com/databricks/spark-xml_2.12/{SPARK_XML_VERSION}/spark-xml_2.12-{SPARK_XML_VERSION}.jar -Lo /opt/spark/jars/spark-xml_2.12-{SPARK_XML_VERSION}.jar
 
 # Install AWS CLI
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
