@@ -1,6 +1,6 @@
 pyiceberg[pyarrow,duckdb,pandas]==0.9.1
 matplotlib==3.10.5
-scipy==1.16.1
+scipy==1.15.3
 duckdb-engine==0.17.0
 grpcio==1.74.0
 grpcio-status==1.74.0
