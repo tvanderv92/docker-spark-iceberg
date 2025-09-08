@@ -43,6 +43,7 @@ ENV SPARK_VERSION=3.5.6
 ENV SPARK_MAJOR_VERSION=3.5
 ENV ICEBERG_VERSION=1.9.0
 ENV SPARK_XML_VERSION=0.18.0
+ENV HADOOP_VERSION=3.3.4
 
 # Download spark
 RUN mkdir -p ${SPARK_HOME} \
@@ -63,7 +64,13 @@ RUN curl -s https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-gcp-bundle
 RUN curl -s https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-azure-bundle/${ICEBERG_VERSION}/iceberg-azure-bundle-${ICEBERG_VERSION}.jar -Lo /opt/spark/jars/iceberg-azure-bundle-${ICEBERG_VERSION}.jar
 
 # Download spark-xml library
-RUN curl -s https://repo1.maven.org/maven2/com/databricks/spark-xml_2.12/{SPARK_XML_VERSION}/spark-xml_2.12-{SPARK_XML_VERSION}.jar -Lo /opt/spark/jars/spark-xml_2.12-{SPARK_XML_VERSION}.jar
+RUN curl -s https://repo1.maven.org/maven2/com/databricks/spark-xml_2.12/${SPARK_XML_VERSION}/spark-xml_2.12-${SPARK_XML_VERSION}.jar -Lo /opt/spark/jars/spark-xml_2.12-${SPARK_XML_VERSION}.jar
+
+RUN curl -s https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/${HADOOP_VERSION}/hadoop-aws-${HADOOP_VERSION}.jar -Lo /opt/spark/jars/hadoop-aws-${HADOOP_VERSION}.jar
+
+# Download AWS SDK JARs for S3A support
+RUN curl -s https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.262/aws-java-sdk-bundle-1.12.262.jar -Lo /opt/spark/jars/aws-java-sdk-bundle-1.12.262.jar
+
 
 # Install AWS CLI
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
